@@ -279,4 +279,18 @@ body {
 	body {
 		padding-bottom: 48px;
 	}
+
+	.container {
+		max-width: 428px;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+
+	.header {
+		height: 48px;
+	}
+
+	.nav {
+		height: 48px;
+	}
 }
