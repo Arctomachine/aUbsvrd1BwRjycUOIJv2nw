@@ -10,6 +10,7 @@
 	--color-grey-dark: hsla(0, 0%, 45%, 1);
 	--color-grey-light: hsla(0, 0%, 90%, 1);
 	--color-white: hsla(0, 0%, 100%, 1);
+	--color-yellow: hsla(44, 97%, 51%, 1);
 }
 
 .desktop-only {
@@ -36,12 +37,6 @@ body {
 	padding-left: 40px;
 	padding-right: 40px;
 	margin: 0 auto;
-}
-
-.grid-container {
-	display: grid;
-	grid-template-columns: repeat(12, 1fr);
-	gap: 20px;
 }
 
 .flex-group {
@@ -186,11 +181,6 @@ body {
 		max-width: 744px;
 		padding-left: 20px;
 		padding-right: 20px;
-	}
-
-	.grid-container {
-		grid-template-columns: repeat(6, 1fr);
-		gap: 16px;
 	}
 
 	.nav {
