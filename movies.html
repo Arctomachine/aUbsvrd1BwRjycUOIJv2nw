@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="header.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+		  rel="stylesheet">
+	<script src="script.js" type="module" defer></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<header class="header">
+	<div class="container">
+		<div class="flex-group search-hide">
+			<button class="menu-button">
+				<img src="assets/Menu.svg" alt="Меню">
+			</button>
+			<img src="assets/Logo.svg" alt="Логотип" class="desktop-only">
+		</div>
+
+		<img src="assets/Logo.svg" alt="Логотип" class="mobile-only search-hide">
+
+		<nav class="nav">
+			<span>Главная</span>
+			<span class="link-active">Фильмы</span>
+			<span>Сериалы</span>
+			<button id="search-button-mobile" class="mobile-only">search</button>
+			<span class="mobile-only">bookmark</span>
+		</nav>
+
+		<div class="flex-group search-stretch">
+			<form class="search-group">
+				<input type="text" class="search-input" placeholder="Поиск по сайту">
+				<button type="reset" class="desktop-only reset-inner">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+							  fill="#E6E6E6"/>
+					</svg>
+				</button>
+				<button type="reset" class="mobile-only">reset</button>
+			</form>
+			<button type="button" class="desktop-only search-hide bookmark-button">
+				<img src="assets/Bookmark.svg" alt="Закладки">
+			</button>
+			<div class="profile search-hide">
+				<div class="profile-icon"></div>
+				<img src="assets/Arrow.svg" alt="Открыть список">
+			</div>
+		</div>
+	</div>
+</header>
+
+<main>main</main>
+<footer>footer</footer>
+</body>
+</html>
