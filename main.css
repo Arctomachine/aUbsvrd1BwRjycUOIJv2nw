@@ -3,6 +3,9 @@ main {
 	padding-bottom: 40px;
 	background-color: var(--color-black-light);
 	color: var(--color-white);
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
 }
 
 .grid-container {
@@ -14,6 +17,10 @@ main {
 	display: grid;
 	grid-template-columns: repeat(12, 1fr);
 	gap: 20px;
+}
+
+.hidden {
+	display: none;
 }
 
 h2 {
