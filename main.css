@@ -20,7 +20,7 @@ main {
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 h2 {
@@ -36,6 +36,7 @@ h2 {
 
 .card {
 	grid-column: span 2;
+	cursor: pointer;
 }
 
 .card .poster {
@@ -123,6 +124,8 @@ h2 {
 	right: 0;
 	bottom: 0;
 	background: linear-gradient(0deg, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.24)), linear-gradient(180deg, rgba(0, 0, 0, 0.2) 3.65%, rgba(0, 0, 0, 0) 47.89%, rgba(11, 11, 11, 0.463503) 64.1%, #181818 94.02%);
+	border-top-left-radius: 24px;
+	border-top-right-radius: 24px;
 }
 
 .details-data {

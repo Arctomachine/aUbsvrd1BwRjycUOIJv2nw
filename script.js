@@ -1,5 +1,5 @@
 import { debounce } from './functions.js'
-import { searchAllByTitle } from './OmdbApi.js'
+import { searchAllByTitle, getMovieDetails } from './OmdbApi.js'
 
 const header = document.querySelector('.header')
 const searchButtonMobile = document.querySelector('#search-button-mobile')
@@ -11,6 +11,31 @@ const searchSection = document.querySelector('#search')
 const popularSection = document.querySelector('#popular')
 const recentSection = document.querySelector('#recent')
 const movieCardTemplate = document.querySelector('#movie-card-template')
+
+let modalIsLoading = false
+document.addEventListener('click', function (event) {
+	const closestCard = event.target.closest('.card')
+
+	if (closestCard === null) {
+		return
+	}
+
+	const movieId = closestCard.getAttribute('data-movie-id')
+
+	if (!movieId) {
+		return
+	}
+
+	if (modalIsLoading) {
+		return
+	}
+
+	const searchParams = new URLSearchParams(window.location.search)
+	searchParams.set('movieId', movieId)
+	window.history.replaceState({}, '', `?${searchParams.toString()}`)
+
+	loadModal(movieId)
+})
 
 const searchDebounce = debounce(async function (text) {
 	if (!text) {
@@ -57,11 +82,19 @@ if (initialUrl.searchParams.has('search')) {
 	recentMovies.currentState = false
 }
 
+if (initialUrl.searchParams.has('movieId')) {
+	const movieId = initialUrl.searchParams.get('movieId')
+	loadModal(movieId)
+}
+
 searchButtonMobile.addEventListener('click', () => {
 	header.classList.toggle('mobile-search')
 })
 
 closeButton.addEventListener('click', () => {
+	const searchParams = new URLSearchParams(window.location.search)
+	searchParams.delete('movieId')
+	window.history.replaceState({}, '', `?${searchParams.toString()}`)
 	modal.close()
 })
 
@@ -153,4 +186,88 @@ function renderSearchList (data) {
 	searchSection.classList.toggle('hidden', !showSearch)
 	popularSection.classList.toggle('hidden', !showPopular)
 	recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
+}
+
+/**
+ *
+ * @param id {string}
+ */
+async function loadModal (id) {
+	modalIsLoading = true
+
+	const data = await getMovieDetails(id)
+
+	const poster = modal.querySelector('.details-poster')
+	if (data.Poster !== 'N/A') {
+		poster.src = data.Poster
+		poster.alt = data.Title
+		poster.classList.toggle('hidden', false)
+	} else {
+		poster.classList.toggle('hidden', true)
+	}
+
+	const title = modal.querySelector('h1')
+	title.innerHTML = data.Title
+
+	const details1 = modal.querySelector('.details-1')
+	const rating = details1.querySelector('.rating')
+	const ratingValue = rating.querySelector('.rating-value')
+	const separator = details1.querySelector('.separator')
+	const year = details1.querySelector('.year')
+	if (data.imdbRating !== 'N/A') {
+		ratingValue.innerHTML = data.imdbRating
+		rating.classList.toggle('hidden', false)
+		separator.classList.toggle('hidden', false)
+	} else {
+		rating.classList.toggle('hidden', true)
+		separator.classList.toggle('hidden', true)
+	}
+	if (data.Year !== 'N/A') {
+		year.innerHTML = data.Year
+		details1.classList.toggle('hidden', false)
+	} else {
+		details1.classList.toggle('hidden', true)
+	}
+
+	const details2 = modal.querySelector('.details-2')
+	if (data.Rated !== 'N/A') {
+		details2.innerHTML = data.Rated
+		details2.classList.toggle('hidden', false)
+	} else {
+		details2.classList.toggle('hidden', true)
+	}
+
+	const details3 = modal.querySelector('.details-3')
+	if (data.Genre !== 'N/A') {
+		const values = data.Genre.split(/\s*,\s*/) // запятая и пробелы
+		details3.innerHTML = ''
+
+		values.forEach((value, index) => {
+			const span = document.createElement('span')
+			span.innerHTML = value.trim()
+			details3.appendChild(span)
+
+			if (index < values.length - 1) {
+				const separator = document.createElement('div')
+				separator.classList.add('separator')
+				details3.appendChild(separator)
+			}
+		})
+
+		details3.classList.toggle('hidden', false)
+	} else {
+		details3.classList.toggle('hidden', true)
+	}
+
+	const details4 = modal.querySelector('.details-4')
+	if (data.Plot !== 'N/A') {
+		details4.innerHTML = data.Plot
+		details4.classList.toggle('hidden', false)
+	} else {
+		details4.classList.toggle('hidden', true)
+	}
+
+	modalIsLoading = false
+
+	modal.showModal()
 }
