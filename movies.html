@@ -8,6 +8,8 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
 		  rel="stylesheet">
+	<script src="functions.js" type="module" defer></script>
+	<script src="OmdbApi.js" type="module" defer></script>
 	<script src="script.js" type="module" defer></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -90,8 +92,8 @@
 		</nav>
 
 		<div class="flex-group search-stretch">
-			<form class="search-group">
-				<input type="text" class="search-input" placeholder="Поиск по сайту" required>
+			<form class="search-group" id="search-form">
+				<input id="search-input" type="text" class="search-input" placeholder="Поиск по сайту" required>
 				<button type="reset" class="reset-inner">
 					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
@@ -116,80 +118,7 @@
 		<div class="container">
 			<h2>Результаты поиска</h2>
 		</div>
-		<div class="grid-container">
-			<div class="card">
-				<img class="poster" src="assets/Poster1.png" alt="Постер">
-				<div class="title">Название фильма</div>
-				<div class="rating">
-					<svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g clip-path="url(#clip0_1_723)">
-							<path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"
-								  fill="#E6E6E6"/>
-						</g>
-						<defs>
-							<clipPath id="clip0_1_723">
-								<rect width="24" height="24" fill="white"/>
-							</clipPath>
-						</defs>
-					</svg>
-					<span>9.0</span>
-				</div>
-			</div>
-			<div class="card">
-				<img class="poster" src="assets/Poster.png" alt="Постер">
-				<div class="title">Название фильма</div>
-				<div class="rating">
-					<svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g clip-path="url(#clip0_1_723)">
-							<path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"
-								  fill="#E6E6E6"/>
-						</g>
-						<defs>
-							<clipPath id="clip0_1_723">
-								<rect width="24" height="24" fill="white"/>
-							</clipPath>
-						</defs>
-					</svg>
-					<span>9.0</span>
-				</div>
-			</div>
-			<div class="card">
-				<img class="poster" src="assets/Poster.png" alt="Постер">
-				<div class="title">Название фильма</div>
-				<div class="rating">
-					<svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g clip-path="url(#clip0_1_723)">
-							<path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"
-								  fill="#E6E6E6"/>
-						</g>
-						<defs>
-							<clipPath id="clip0_1_723">
-								<rect width="24" height="24" fill="white"/>
-							</clipPath>
-						</defs>
-					</svg>
-					<span>9.0</span>
-				</div>
-			</div>
-			<div class="card">
-				<img class="poster" src="assets/Poster.png" alt="Постер">
-				<div class="title">Название фильма</div>
-				<div class="rating">
-					<svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g clip-path="url(#clip0_1_723)">
-							<path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"
-								  fill="#E6E6E6"/>
-						</g>
-						<defs>
-							<clipPath id="clip0_1_723">
-								<rect width="24" height="24" fill="white"/>
-							</clipPath>
-						</defs>
-					</svg>
-					<span>9.0</span>
-				</div>
-			</div>
-		</div>
+		<div class="grid-container"></div>
 	</section>
 
 	<section id="popular">
@@ -425,7 +354,7 @@
 	</section>
 </main>
 
-<dialog open class="details-modal">
+<dialog class="details-modal">
 	<button class="close">
 		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
@@ -515,5 +444,26 @@
 		</div>
 	</div>
 </dialog>
+
+<template id="movie-card-template">
+	<div class="card">
+		<img class="poster" src="" alt="Постер">
+		<div class="title">Название фильма</div>
+		<div class="rating">
+			<svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<g clip-path="url(#clip0_1_723)">
+					<path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"
+						  fill="#E6E6E6"/>
+				</g>
+				<defs>
+					<clipPath id="clip0_1_723">
+						<rect width="24" height="24" fill="white"/>
+					</clipPath>
+				</defs>
+			</svg>
+			<span>9.0</span>
+		</div>
+	</div>
+</template>
 </body>
 </html>
