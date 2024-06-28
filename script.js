@@ -43,7 +43,7 @@ const searchDebounce = debounce(async function (text) {
 	}
 
 	const data = await searchAllByTitle(text)
-	renderSearchList(data.Search)
+	renderList(data.Search, 'search')
 }, 1500)
 
 /**
@@ -62,9 +62,12 @@ const recentMovies = {
 		return this.currentState && this.value.length > 0
 	},
 	add (movie) {
-		this.value.shift()
+		if (this.value.length >= 6) {
+			this.value.shift()
+		}
 		this.value.push(movie)
 		sessionStorage.setItem('recentMovies', JSON.stringify(this.value))
+		renderList(this.value, 'recent', 'recent')
 	},
 }
 let showPopular = true
@@ -76,10 +79,9 @@ if (initialUrl.searchParams.has('search')) {
 	const searchString = initialUrl.searchParams.get('search')
 	searchInput.value = searchString
 	searchDebounce(searchString, 0)
-
-	showSearch = true
-	showPopular = false
-	recentMovies.currentState = false
+} else {
+	renderList([], 'popular')
+	renderList(recentMovies.value, 'recent', 'recent')
 }
 
 if (initialUrl.searchParams.has('movieId')) {
@@ -105,7 +107,7 @@ searchForm.addEventListener('submit', async (e) => {
 	const text = searchInput.value
 
 	const data = await searchAllByTitle(text)
-	renderSearchList(data.Search)
+	renderList(data.Search, 'search')
 })
 
 searchForm.addEventListener('reset', (e) => {
@@ -116,13 +118,9 @@ searchForm.addEventListener('reset', (e) => {
 
 	window.history.replaceState({}, '', `?${searchParams.toString()}`)
 
-	showSearch = false
-	showPopular = true
-	recentMovies.currentState = true
-
-	searchSection.classList.toggle('hidden', !showSearch)
-	popularSection.classList.toggle('hidden', !showPopular)
+	popularSection.classList.toggle('hidden', false)
 	recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
+	searchSection.classList.toggle('hidden', true)
 })
 
 searchInput.addEventListener('input', function (e) {
@@ -143,17 +141,39 @@ searchInput.addEventListener('input', function (e) {
  *    Year: string,
  *    imdbID: string,
  *  }[]}
+ *  @param section {'search' | 'popular' | 'recent'}
+ *  @param sortBy {'year' | 'recent'}
  */
-function renderSearchList (data) {
-	const sortedData = [...data].sort((a, b) => {
+function renderList (data, section, sortBy = 'year') {
+	if (!data) {
+		alert('По такому запросу ничего не найдено')
+		return
+	}
+
+	const sortedData = sortBy === 'year' ? [...data].sort((a, b) => {
 		return Number(b.Year) - Number(a.Year)
-	})
+	}) : [...data].reverse()
 
 	if (!'content' in document.createElement('template')) {
 		return
 	}
 
-	const parent = searchSection.querySelector('.grid-container')
+	let targetSection
+	switch (section) {
+		case 'search':
+			targetSection = searchSection
+			break
+		case 'popular':
+			targetSection = popularSection
+			break
+		case 'recent':
+			targetSection = recentSection
+			break
+		default:
+			return
+	}
+
+	const parent = targetSection.querySelector('.grid-container')
 	parent.innerHTML = ''
 
 	for (const movie of sortedData) {
@@ -172,20 +192,33 @@ function renderSearchList (data) {
 		title.innerHTML = movie.Title
 
 		const rating = clone.querySelector('.rating')
-		if (rating) {
+		if (movie.imdbRating !== 'N/A') {
+			rating.querySelector('.rating-value').innerHTML = movie.imdbRating
+		} else {
 			rating.parentNode.removeChild(rating)
 		}
 
 		parent.appendChild(clone)
 	}
 
-	showSearch = true
-	showPopular = false
-	recentMovies.currentState = false
+	switch (section) {
+		case 'search':
+			showPopular = false
+			showSearch = true
+			break
+		case 'popular':
+			showPopular = true
+			showSearch = false
+			break
+		case 'recent':
+			showPopular = true
+			showSearch = false
+			break
+		default:
+			break
+	}
 
-	searchSection.classList.toggle('hidden', !showSearch)
-	popularSection.classList.toggle('hidden', !showPopular)
-	recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
+	onRenderFinish()
 }
 
 /**
@@ -270,4 +303,21 @@ async function loadModal (id) {
 	modalIsLoading = false
 
 	modal.showModal()
+
+	recentMovies.add(data)
+}
+
+function onRenderFinish () {
+	const searchParams = new URLSearchParams(window.location.search)
+	const search = searchParams.get('search')
+
+	if (search) {
+		popularSection.classList.toggle('hidden', true)
+		recentSection.classList.toggle('hidden', true)
+		searchSection.classList.toggle('hidden', false)
+	} else {
+		popularSection.classList.toggle('hidden', !showPopular)
+		recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
+		searchSection.classList.toggle('hidden', true)
+	}
 }
