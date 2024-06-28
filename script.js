@@ -42,7 +42,7 @@ const searchDebounce = debounce(async function (text) {
 		return
 	}
 
-	const data = await searchAllByTitle(text)
+	const data = await searchAllByTitle(text.trim())
 	renderList(data.Search, 'search')
 }, 1500)
 
@@ -62,10 +62,18 @@ const recentMovies = {
 		return this.currentState && this.value.length > 0
 	},
 	add (movie) {
+		const listOfIds = this.value.map(movie => movie.imdbID)
+		if (listOfIds.includes(movie.imdbID)) {
+			const index = listOfIds.indexOf(movie.imdbID)
+			this.value.splice(index, 1)
+		}
+
+		this.value.push(movie)
+
 		if (this.value.length >= 6) {
 			this.value.shift()
 		}
-		this.value.push(movie)
+
 		sessionStorage.setItem('recentMovies', JSON.stringify(this.value))
 		renderList(this.value, 'recent', 'recent')
 	},
@@ -110,21 +118,16 @@ searchForm.addEventListener('submit', async (e) => {
 	renderList(data.Search, 'search')
 })
 
-searchForm.addEventListener('reset', (e) => {
-	searchDebounce(undefined, 0)
-
-	const searchParams = new URLSearchParams(window.location.search)
-	searchParams.delete('search')
-
-	window.history.replaceState({}, '', `?${searchParams.toString()}`)
-
-	popularSection.classList.toggle('hidden', false)
-	recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
-	searchSection.classList.toggle('hidden', true)
-})
+searchForm.addEventListener('reset', onSearchStringEmpty)
 
 searchInput.addEventListener('input', function (e) {
-	searchDebounce(e.target.value)
+	const text = e.target.value
+
+	if (text.length < 1) {
+		onSearchStringEmpty()
+	}
+
+	searchDebounce(text)
 
 	const searchParams = new URLSearchParams(window.location.search)
 	searchParams.set('search', e.target.value)
@@ -320,4 +323,17 @@ function onRenderFinish () {
 		recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
 		searchSection.classList.toggle('hidden', true)
 	}
+}
+
+function onSearchStringEmpty () {
+	searchDebounce(undefined, 0)
+
+	const searchParams = new URLSearchParams(window.location.search)
+	searchParams.delete('search')
+
+	window.history.replaceState({}, '', `?${searchParams.toString()}`)
+
+	popularSection.classList.toggle('hidden', false)
+	recentSection.classList.toggle('hidden', !recentMovies.shouldShow())
+	searchSection.classList.toggle('hidden', true)
 }
